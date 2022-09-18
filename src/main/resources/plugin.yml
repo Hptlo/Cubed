@@ -1,0 +1,12 @@
+name: "Cubed"
+main: de.dopebrot.cubed.Main
+description: plugindesc
+version: 2
+load: POSTWORLD
+api-version: 1.18
+depend: ["DopeAPI"]
+commands:
+  teleport:
+  cube-calc:
+  cube:
+
