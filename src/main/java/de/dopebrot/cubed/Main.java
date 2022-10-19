@@ -1,41 +1,46 @@
 package de.dopebrot.cubed;
 
-import de.dopebrot.cubed.command.CalculateBlocksCommand;
 import de.dopebrot.cubed.command.CubeCommand;
-import de.dopebrot.cubed.command.TeleportCommand;
 import de.dopebrot.cubed.world.CubeGenerator;
 import de.dopebrot.cubed.world.WorldGenerator;
+import de.dopebrot.dopeapi.helper.DPCommand;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.Validate;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Objects;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class Main extends JavaPlugin {
 
-	private TeleportCommand teleportCommand;
-	private CalculateBlocksCommand calculateBlocksCommand;
 	private CubeCommand cubeCommand;
 	private CubeGenerator cubeGenerator;
 	private World cubedWorld;
-
+	private LanguageManager languageManager;
 
 	@Override
 	public void onEnable() {
 		checkWorlds();
 		registerCommands();
-
+		this.languageManager = new LanguageManager(this);
 		this.cubeGenerator = new CubeGenerator(this);
 		this.cubeGenerator.setWorld(cubedWorld);
 	}
 
+	private void cmd(DPCommand command, String name) {
+		Validate.notNull(command,"command can't be null!");
+		Validate.notNull(name,"name can't be null!");
+		Validate.notEmpty(name,"name can't be empty!");
+		getCommand(name).setExecutor(command);
+		getCommand(name).setTabCompleter(command);
+	}
+
 	private void registerCommands() {
-		this.teleportCommand = new TeleportCommand(this);
-		this.calculateBlocksCommand = new CalculateBlocksCommand(this);
 		this.cubeCommand = new CubeCommand(this);
-		getCommand(teleportCommand.getCommandName()).setExecutor(teleportCommand);
-		getCommand(calculateBlocksCommand.getCommandName()).setExecutor(calculateBlocksCommand);
-		getCommand(cubeCommand.getCommandName()).setExecutor(cubeCommand);
+		cmd(cubeCommand, "cube");
 	}
 
 	private void checkWorlds() {
@@ -54,6 +59,19 @@ public class Main extends JavaPlugin {
 
 	}
 
+	public void getResourceFile(String fileName, File file) {
+		InputStream inputStream = this.getResource(fileName);
+		try {
+			assert inputStream != null;
+			FileUtils.copyInputStreamToFile(inputStream, file);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public LanguageManager languageManager() {
+		return languageManager;
+	}
 	public CubeGenerator getCubeGenerator() {
 		return cubeGenerator;
 	}
