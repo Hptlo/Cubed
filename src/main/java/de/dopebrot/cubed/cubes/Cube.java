@@ -1,10 +1,11 @@
 package de.dopebrot.cubed.cubes;
 import org.apache.commons.lang.Validate;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
+import org.bukkit.block.Chest;
+import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Random;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -37,6 +38,16 @@ public class Cube {
 		this.homeLocation.setYaw(90f);
 	}
 
+	public void resetCube() {
+		for (int x = 1; x <= 14; x++) {
+			for (int z = 1; z <= 14; z++) {
+				for (int y = 1; y <= size; y++) {
+					chunk.getBlock(x, y, z).setType(Material.BEDROCK);
+				}
+			}
+		}
+	}
+
 	public void clearCube(boolean whole) {
 		if (whole) {
 			for (int x = 1; x <= 14; x++) {
@@ -50,37 +61,46 @@ public class Cube {
 			for (int x = 7; x <= 8; x++) {
 				for (int z = 7; z <= 8; z++) {
 					for (int y = 1; y <= 2; y++) {
-						chunk.getBlock(x, y, z).setType(Material.WATER);
+						chunk.getBlock(x, y, z).setType(Material.AIR);
 					}
 				}
 			}
 		}
 	}
 
-
-	public void calculateBlocks() {
+	public float calculateBlocks() {
 		int count = 0;
 		for (int x = 1; x <= 14; x++) {
 			for (int z = 1; z <= 14; z++) {
 				for (int y = 1; y <= size; y++) {
-					if (chunk.getBlock(x, y, z).getType() != Material.AIR) {
+					if (chunk.getBlock(x, y, z).getType() == Material.AIR) {
 						count++;
 					}
 				}
 			}
 		}
-		Bukkit.getLogger().log(Level.INFO, "precent of blocks destroyed: " + (14 * 14 * size) * (count / 100));
+//		Bukkit.getLogger().log(Level.INFO, "Precent of blocks destroyed: " + (Math.round(((count / (14f * 14f * size)) * 100f) * 100f) / 100f) + "%");
+		return (Math.round(((count / (14f * 14f * size)) * 100f) * 100f) / 100f);
 	}
 
 	public void setBlocks() {
+		Material[] material = new BlockGenerator().getBlocks(14 * 14 * size + 1, level, new Random());
+		int counter = 0;
 		for (int x = 1; x <= 14; x++) {
 			for (int z = 1; z <= 14; z++) {
 				for (int y = 1; y <= size; y++) {
-					chunk.getBlock(x, y, z).setType(Material.STONE);
+					counter++;
+					chunk.getBlock(x, y, z).setType(material[counter]);
+					if (material[counter] == Material.CHEST) {
+						if (chunk.getBlock(x, y, z) instanceof Chest chest) {
+							chest.getBlockInventory().setItem(0, new ItemStack(Material.STONE));
+						}
+					}
 				}
 			}
 		}
 	}
+
 
 	public int getLevel() {
 		return level;
