@@ -1,0 +1,10 @@
+## $0$ is a argument e.g "cube.command.error: Command $0$ Error"
+## :: "Command HelpCommand Error"
+
+cubed:
+  cube_command_calc_percent: "Cube Percentage: %0%!"
+  cube_command_calc_percent_100: "Cube is Cleared!"
+  cube_player_teleported: "Teleported!"
+
+  cube_new_generated: "New Cube Generated!"
+  cube_deleted: "Cube Deleted!"
